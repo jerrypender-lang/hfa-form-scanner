@@ -9,148 +9,78 @@
 <meta name="apple-mobile-web-app-title" content="HFA Forms">
 <title>HFA Form Scanner</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  :root {
-    --teal: #2C5F6F;
-    --teal-light: #4A8A9A;
-    --coral: #D97757;
-    --green: #34d399;
-    --cream: #FDF9F4;
-    --dark: #0d1117;
-    --card: #161d2a;
-    --border: rgba(255,255,255,0.08);
-    --text: #e2e8f0;
-    --muted: rgba(255,255,255,0.4);
-  }
-
-  body {
-    font-family: -apple-system, 'SF Pro Display', 'Segoe UI', Arial, sans-serif;
-    background: var(--dark);
-    color: var(--text);
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    display: flex;
-    flex-direction: column;
-    max-width: 480px;
-    margin: 0 auto;
-  }
-
-  /* HEADER */
-  .header {
-    background: linear-gradient(135deg, #1a2942 0%, var(--teal) 100%);
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  .header-brand { font-size: 10px; color: var(--coral); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
-  .header-title { font-size: 20px; font-weight: 700; color: #fff; }
-  .header-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
-
-  /* PROGRESS BAR */
-  .progress { display: flex; gap: 5px; margin-top: 14px; }
-  .progress-dot { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.1); transition: background 0.3s; }
-  .progress-dot.done { background: var(--coral); }
-  .progress-dot.active { background: var(--teal-light); }
-
-  /* BODY */
-  .body { flex: 1; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; }
-
-  /* CARD */
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-  .card-head { padding: 12px 16px; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; }
-  .card-body { padding: 16px; }
-
-  /* PHOTO ZONE */
-  .photo-zone {
-    border: 2px dashed rgba(255,255,255,0.13);
-    border-radius: 12px;
-    padding: 36px 20px;
-    text-align: center;
-    cursor: pointer;
-    background: rgba(255,255,255,0.02);
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
-  }
-  .photo-zone:active { border-color: var(--teal-light); background: rgba(44,95,111,0.08); }
-  .photo-zone-icon { font-size: 44px; margin-bottom: 10px; }
-  .photo-zone-label { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
-  .photo-zone-sub { font-size: 12px; color: var(--muted); }
-  .photo-zone-or { text-align: center; font-size: 11px; color: rgba(255,255,255,0.2); margin: 10px 0; }
-
-  /* PREVIEW */
-  .preview-img { width: 100%; border-radius: 10px; max-height: 240px; object-fit: cover; display: block; }
-
-  /* FORM FIELDS */
-  .field { margin-bottom: 14px; }
-  .field:last-child { margin-bottom: 0; }
-  .field-label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
-  .field-input {
-    width: 100%; padding: 13px 14px; border-radius: 10px;
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-    color: var(--text); font-size: 16px; outline: none;
-    transition: border-color 0.15s;
-    -webkit-appearance: none;
-  }
-  .field-input:focus { border-color: var(--teal-light); }
-  .field-input::placeholder { color: rgba(255,255,255,0.18); }
-  select.field-input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
-  select.field-input option { background: #1a2942; color: var(--text); }
-
-  /* BUTTONS */
-  .btn { display: block; width: 100%; padding: 15px 16px; border-radius: 11px; border: none; font-weight: 600; font-size: 16px; cursor: pointer; transition: opacity 0.15s, transform 0.1s; text-align: center; }
-  .btn:active { transform: scale(0.98); }
-  .btn-primary { background: var(--coral); color: #fff; }
-  .btn-secondary { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.55); border: 1px solid var(--border); }
-  .btn-row { display: flex; gap: 10px; }
-  .btn-row .btn { flex: 1; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* TIPS */
-  .tip { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
-  .tip-icon { color: var(--coral); flex-shrink: 0; font-size: 13px; margin-top: 1px; }
-  .tip-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-
-  /* LOADING */
-  .loading-wrap { padding: 32px; text-align: center; }
-  .spinner { width: 42px; height: 42px; border: 3px solid rgba(255,255,255,0.08); border-top-color: var(--coral); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 18px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-  .loading-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .loading-steps { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
-  .loading-step { font-size: 12px; color: rgba(255,255,255,0.25); }
-  .loading-step.active-step { color: var(--teal-light); }
-
-  /* SUCCESS */
-  .success-icon { font-size: 52px; text-align: center; margin-bottom: 12px; }
-  .success-title { font-size: 20px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 6px; }
-  .success-sub { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; margin-bottom: 16px; }
-  .form-url-box { background: rgba(44,95,111,0.18); border: 1px solid rgba(44,95,111,0.35); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; color: var(--teal-light); word-break: break-all; }
-  .form-url-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
-  .qr-box { background: #fff; border-radius: 10px; padding: 12px; display: flex; justify-content: center; margin-bottom: 12px; }
-  .qr-box img { width: 160px; height: 160px; }
-  .qr-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px; }
-  .notif-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
-  .notif-icon { font-size: 16px; }
-  .notif-text { font-size: 13px; color: var(--muted); flex: 1; }
-  .notif-status { font-size: 12px; color: var(--green); font-weight: 500; }
-  .notif-row:last-child { border-bottom: none; }
-
-  /* FIELDS DETECTED */
-  .field-tag { display: inline-flex; align-items: center; gap: 4px; background: rgba(74,138,154,0.12); color: var(--teal-light); font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 5px; margin: 2px; }
-
-  /* ERROR */
-  .error-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #fca5a5; line-height: 1.5; }
-
-  /* FOOTER */
-  .footer { padding: 14px 16px; border-top: 1px solid var(--border); text-align: center; font-size: 10px; color: rgba(255,255,255,0.15); }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --teal: #2C5F6F; --teal-light: #4A8A9A; --coral: #D97757;
+  --green: #34d399; --dark: #0d1117; --card: #161d2a;
+  --border: rgba(255,255,255,0.08); --text: #e2e8f0;
+  --muted: rgba(255,255,255,0.4);
+}
+body { font-family: -apple-system,'SF Pro Display','Segoe UI',Arial,sans-serif; background:var(--dark); color:var(--text); min-height:100vh; display:flex; flex-direction:column; max-width:480px; margin:0 auto; }
+.header { background:linear-gradient(135deg,#1a2942 0%,var(--teal) 100%); padding:20px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.06); position:sticky; top:0; z-index:10; }
+.header-brand { font-size:10px; color:var(--coral); letter-spacing:.14em; text-transform:uppercase; margin-bottom:4px; font-weight:600; }
+.header-title { font-size:20px; font-weight:700; color:#fff; }
+.header-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+.progress { display:flex; gap:5px; margin-top:14px; }
+.progress-dot { flex:1; height:3px; border-radius:2px; background:rgba(255,255,255,0.1); transition:background 0.3s; }
+.progress-dot.done { background:var(--coral); }
+.progress-dot.active { background:var(--teal-light); }
+.body { flex:1; padding:20px 16px; display:flex; flex-direction:column; gap:14px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.card-head { padding:12px 16px; background:rgba(255,255,255,0.03); border-bottom:1px solid var(--border); font-size:11px; font-weight:600; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:.1em; }
+.card-body { padding:16px; }
+.photo-zone { border:2px dashed rgba(255,255,255,0.13); border-radius:12px; padding:36px 20px; text-align:center; cursor:pointer; background:rgba(255,255,255,0.02); transition:border-color 0.2s,background 0.2s; }
+.photo-zone:active { border-color:var(--teal-light); background:rgba(44,95,111,0.08); }
+.photo-zone-icon { font-size:44px; margin-bottom:10px; }
+.photo-zone-label { font-size:16px; font-weight:600; color:var(--text); margin-bottom:5px; }
+.photo-zone-sub { font-size:12px; color:var(--muted); }
+.photo-zone-or { text-align:center; font-size:11px; color:rgba(255,255,255,0.2); margin:10px 0; }
+.preview-img { width:100%; border-radius:10px; max-height:240px; object-fit:cover; display:block; }
+.compress-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(52,211,153,0.12); color:var(--green); font-size:11px; font-weight:500; padding:4px 10px; border-radius:20px; margin-top:8px; }
+.field { margin-bottom:14px; }
+.field:last-child { margin-bottom:0; }
+.field-label { display:block; font-size:11px; color:var(--muted); margin-bottom:6px; font-weight:500; text-transform:uppercase; letter-spacing:.08em; }
+.field-input { width:100%; padding:13px 14px; border-radius:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text); font-size:16px; outline:none; -webkit-appearance:none; transition:border-color 0.15s; }
+.field-input:focus { border-color:var(--teal-light); }
+.field-input::placeholder { color:rgba(255,255,255,0.18); }
+select.field-input { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:40px; }
+select.field-input option { background:#1a2942; color:var(--text); }
+.btn { display:block; width:100%; padding:15px 16px; border-radius:11px; border:none; font-weight:600; font-size:16px; cursor:pointer; transition:opacity 0.15s,transform 0.1s; text-align:center; }
+.btn:active { transform:scale(0.98); }
+.btn-primary { background:var(--coral); color:#fff; }
+.btn-secondary { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.55); border:1px solid var(--border); }
+.btn-row { display:flex; gap:10px; }
+.btn-row .btn { flex:1; }
+.tip { display:flex; gap:10px; margin-bottom:10px; align-items:flex-start; }
+.tip-icon { color:var(--coral); flex-shrink:0; font-size:13px; margin-top:1px; }
+.tip-text { font-size:13px; color:var(--muted); line-height:1.5; }
+.loading-wrap { padding:32px; text-align:center; }
+.spinner { width:42px; height:42px; border:3px solid rgba(255,255,255,0.08); border-top-color:var(--coral); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 18px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-title { font-size:16px; font-weight:600; color:var(--text); margin-bottom:8px; }
+.loading-sub { font-size:13px; color:var(--muted); line-height:1.6; }
+.loading-steps { margin-top:20px; display:flex; flex-direction:column; gap:8px; }
+.loading-step { font-size:12px; color:rgba(255,255,255,0.25); transition:color 0.3s; }
+.loading-step.active-step { color:var(--teal-light); }
+.success-icon { font-size:52px; text-align:center; margin-bottom:12px; }
+.success-title { font-size:20px; font-weight:700; color:#fff; text-align:center; margin-bottom:6px; }
+.success-sub { font-size:13px; color:var(--muted); text-align:center; line-height:1.6; margin-bottom:16px; }
+.form-url-box { background:rgba(44,95,111,0.18); border:1px solid rgba(44,95,111,0.35); border-radius:10px; padding:12px 14px; margin-bottom:12px; font-size:13px; color:var(--teal-light); word-break:break-all; }
+.form-url-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; }
+.qr-box { background:#fff; border-radius:10px; padding:12px; display:flex; justify-content:center; margin-bottom:12px; }
+.qr-box img { width:160px; height:160px; }
+.qr-note { font-size:11px; color:var(--muted); text-align:center; margin-top:6px; }
+.notif-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+.notif-row:last-child { border-bottom:none; }
+.notif-icon { font-size:16px; }
+.notif-text { font-size:13px; color:var(--muted); flex:1; }
+.notif-status { font-size:12px; color:var(--green); font-weight:500; }
+.error-box { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:10px; padding:12px 14px; font-size:13px; color:#fca5a5; line-height:1.5; }
+.footer { padding:14px 16px; border-top:1px solid var(--border); text-align:center; font-size:10px; color:rgba(255,255,255,0.15); }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-brand">Human First Automations</div>
   <div class="header-title">Form Scanner</div>
@@ -163,279 +93,239 @@
   </div>
 </div>
 
-<div class="body" id="app-body">
-  <!-- Steps rendered by JS -->
-</div>
+<div class="body" id="app-body"></div>
+<div class="footer">Human First Automations · Form Scanner v2.1</div>
 
-<div class="footer">Human First Automations · Form Scanner v2.0</div>
-
-<!-- HIDDEN FILE INPUTS -->
 <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none">
 <input type="file" id="library-input" accept="image/*" style="display:none">
 
 <script>
 const WEBHOOK_URL = "https://n8n.srv1155428.hstgr.cloud/webhook/form-scanner";
+const MAX_PX = 1400;
+const JPEG_QUALITY = 0.85;
 
 const INDUSTRIES = [
-  { value: "", label: "Select industry..." },
-  { value: "health", label: "🏥 Health & Medical (Dental, Clinic)" },
-  { value: "legal", label: "⚖️ Legal & Financial (Law, CPA, Insurance)" },
-  { value: "food", label: "🍽️ Restaurant & Food" },
-  { value: "beauty", label: "💅 Beauty & Salon (Nail, Spa, Hair)" },
-  { value: "education", label: "🎓 Education & Tutoring (학원)" },
-  { value: "construction", label: "🔨 Construction & Trades" },
-  { value: "automotive", label: "🚗 Automotive" },
-  { value: "church", label: "⛪ Church & Community" },
-  { value: "travel", label: "✈️ Travel Agency" },
-  { value: "other", label: "💼 Other Business" }
+  {value:"",label:"Select industry..."},
+  {value:"health",label:"🏥 Health & Medical (Dental, Clinic)"},
+  {value:"legal",label:"⚖️ Legal & Financial (Law, CPA, Insurance)"},
+  {value:"food",label:"🍽️ Restaurant & Food"},
+  {value:"beauty",label:"💅 Beauty & Salon (Nail, Spa, Hair)"},
+  {value:"education",label:"🎓 Education & Tutoring (학원)"},
+  {value:"construction",label:"🔨 Construction & Trades"},
+  {value:"automotive",label:"🚗 Automotive"},
+  {value:"church",label:"⛪ Church & Community"},
+  {value:"travel",label:"✈️ Travel Agency"},
+  {value:"other",label:"💼 Other Business"}
 ];
 
 let state = {
-  step: 0, // 0=photo, 1=info, 2=loading, 3=done
-  imageBase64: null,
-  imageType: "image/jpeg",
-  preview: null,
-  bizName: "", ownerName: "", phone: "", email: "", industry: "",
-  result: null,
-  error: null,
+  step:0, imageBase64:null, imageType:"image/jpeg",
+  preview:null, originalSize:0, compressedSize:0,
+  bizName:"", ownerName:"", phone:"", email:"", industry:"",
+  result:null, error:null
 };
 
+// ── IMAGE COMPRESSION ─────────────────────────────────────────────────────────
+// Converts ANY image format (including HEIC from iPhone library) to JPEG
+// and resizes to max 1400px. Reduces 5MB HEIC to ~300KB JPEG.
+function compressToJpeg(file) {
+  return new Promise(function(resolve, reject) {
+    var objectUrl = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function() {
+      URL.revokeObjectURL(objectUrl);
+      var w = img.naturalWidth, h = img.naturalHeight;
+      // Resize if larger than MAX_PX on either dimension
+      if (w > MAX_PX || h > MAX_PX) {
+        if (w > h) { h = Math.round(h * MAX_PX / w); w = MAX_PX; }
+        else { w = Math.round(w * MAX_PX / h); h = MAX_PX; }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(function(blob) {
+        if (!blob) { reject(new Error('Canvas toBlob failed')); return; }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var dataUrl = e.target.result;
+          resolve({
+            base64: dataUrl.split(',')[1],
+            type: 'image/jpeg',
+            dataUrl: dataUrl,
+            originalSize: file.size,
+            compressedSize: blob.size,
+          });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      }, 'image/jpeg', JPEG_QUALITY);
+    };
+    img.onerror = function() {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Could not load image — try taking a new photo instead'));
+    };
+    img.src = objectUrl;
+  });
+}
+
+// ── PROGRESS & RENDER ─────────────────────────────────────────────────────────
 function setStep(s) {
   state.step = s;
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById("dot-" + i);
-    dot.className = "progress-dot" + (i < s ? " done" : i === s ? " active" : "");
+  for (var i = 0; i < 4; i++) {
+    var dot = document.getElementById('dot-' + i);
+    if (dot) dot.className = 'progress-dot' + (i < s ? ' done' : i === s ? ' active' : '');
   }
   render();
 }
 
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+
+function fmt(bytes) {
+  return bytes < 1024 ? bytes + 'B' : bytes < 1048576 ? Math.round(bytes/1024) + 'KB' : (bytes/1048576).toFixed(1) + 'MB';
+}
+
 function render() {
-  const body = document.getElementById("app-body");
+  var body = document.getElementById('app-body');
+  if (!body) return;
   if (state.step === 0) body.innerHTML = renderPhoto();
   else if (state.step === 1) body.innerHTML = renderInfo();
   else if (state.step === 2) body.innerHTML = renderLoading();
-  else if (state.step === 3) body.innerHTML = renderDone();
+  else body.innerHTML = renderDone();
   bindEvents();
 }
 
 function renderPhoto() {
-  return `
-    <div class="card">
-      <div class="card-head">Step 1 — Take a Photo</div>
-      <div class="card-body">
-        <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">Take a clear photo of the customer's paper form. Make sure all fields are visible.</p>
-        <div class="photo-zone" id="btn-camera">
-          <div class="photo-zone-icon">📷</div>
-          <div class="photo-zone-label">Take Photo</div>
-          <div class="photo-zone-sub">Point camera at the paper form</div>
-        </div>
-        <div class="photo-zone-or">— or —</div>
-        <div class="photo-zone" id="btn-library">
-          <div class="photo-zone-icon">🖼️</div>
-          <div class="photo-zone-label">Choose from Library</div>
-          <div class="photo-zone-sub">Select an existing photo</div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head">📋 Photo Tips</div>
-      <div class="card-body">
-        ${["Lay the form flat on a table", "Hold phone directly above, not at an angle", "Make sure the entire form fits in frame", "Good lighting — no shadows across the text", "If multiple pages, scan the most important one first"].map(t => `<div class="tip"><span class="tip-icon">✓</span><span class="tip-text">${t}</span></div>`).join("")}
-      </div>
-    </div>`;
+  return '<div class="card"><div class="card-head">Step 1 — Take a Photo</div><div class="card-body">'
+    + '<p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">Take a clear photo of the paper form. All text must be readable. Any photo format works — the app converts it automatically.</p>'
+    + '<div class="photo-zone" id="btn-camera"><div class="photo-zone-icon">📷</div><div class="photo-zone-label">Take Photo</div><div class="photo-zone-sub">Use camera — best quality</div></div>'
+    + '<div class="photo-zone-or">— or —</div>'
+    + '<div class="photo-zone" id="btn-library"><div class="photo-zone-icon">🖼️</div><div class="photo-zone-label">Choose from Library</div><div class="photo-zone-sub">Select existing photo</div></div>'
+    + '</div></div>'
+    + '<div class="card"><div class="card-head">📋 Photo Tips</div><div class="card-body">'
+    + ['Lay the form flat on a table — no folds or curling','Hold phone directly above, not at an angle','Entire form must fit in the frame — nothing cut off','Good even lighting — no shadows across the text','HEIC, JPG, PNG all work — app converts automatically'].map(function(t){ return '<div class="tip"><span class="tip-icon">✓</span><span class="tip-text">'+t+'</span></div>'; }).join('')
+    + '</div></div>';
 }
 
 function renderInfo() {
-  const industryOptions = INDUSTRIES.map(i => `<option value="${i.value}" ${state.industry === i.value ? "selected" : ""}>${i.label}</option>`).join("");
-  return `
-    ${state.preview ? `
-    <div class="card">
-      <div class="card-head">Photo Captured ✓</div>
-      <div class="card-body">
-        <img src="${state.preview}" class="preview-img" alt="Form preview">
-        <div style="margin-top:10px">
-          <button class="btn btn-secondary" id="btn-retake">Retake Photo</button>
-        </div>
-      </div>
-    </div>` : ""}
-    <div class="card">
-      <div class="card-head">Step 2 — Business Information</div>
-      <div class="card-body">
-        <div class="field">
-          <label class="field-label">Business Name *</label>
-          <input class="field-input" id="f-bizname" type="text" placeholder="e.g. Seoul Garden Restaurant" value="${esc(state.bizName)}">
-        </div>
-        <div class="field">
-          <label class="field-label">Owner / Contact Name</label>
-          <input class="field-input" id="f-owner" type="text" placeholder="e.g. Park Ji-young" value="${esc(state.ownerName)}">
-        </div>
-        <div class="field">
-          <label class="field-label">Owner Phone Number *</label>
-          <input class="field-input" id="f-phone" type="tel" placeholder="(770) 555-0123" value="${esc(state.phone)}">
-        </div>
-        <div class="field">
-          <label class="field-label">Owner Email Address</label>
-          <input class="field-input" id="f-email" type="email" placeholder="owner@business.com" value="${esc(state.email)}">
-        </div>
-        <div class="field">
-          <label class="field-label">Industry *</label>
-          <select class="field-input" id="f-industry">${industryOptions}</select>
-        </div>
-        ${state.error ? `<div class="error-box" style="margin-bottom:14px">${state.error}</div>` : ""}
-        <div class="btn-row">
-          <button class="btn btn-secondary" id="btn-back">Back</button>
-          <button class="btn btn-primary" id="btn-submit">Create Digital Form →</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head">What Happens Next</div>
-      <div class="card-body">
-        ${[["🤖","Claude reads every field from the photo"],["📝","A matching digital Tally form is built"],["📱","Owner gets a text with their form link"],["📧","Owner gets email with QR code"],["🖨️","You receive confirmation SMS"]].map(([icon,text]) => `<div class="tip"><span style="font-size:18px;flex-shrink:0">${icon}</span><span class="tip-text">${text}</span></div>`).join("")}
-      </div>
-    </div>`;
+  var opts = INDUSTRIES.map(function(i){ return '<option value="'+i.value+'"'+(state.industry===i.value?' selected':'')+'>'+i.label+'</option>'; }).join('');
+  var sizeInfo = state.compressedSize ? '<div class="compress-badge">✅ Image ready · '+fmt(state.compressedSize)+'</div>' : '';
+  return (state.preview ? '<div class="card"><div class="card-head">Photo Captured ✓</div><div class="card-body"><img src="'+state.preview+'" class="preview-img" alt="Form preview">'+sizeInfo+'<div style="margin-top:10px"><button class="btn btn-secondary" id="btn-retake">Retake Photo</button></div></div></div>' : '')
+    + '<div class="card"><div class="card-head">Step 2 — Business Information</div><div class="card-body">'
+    + '<div class="field"><label class="field-label">Business Name *</label><input class="field-input" id="f-biz" type="text" placeholder="e.g. Seoul Garden Restaurant" value="'+esc(state.bizName)+'"></div>'
+    + '<div class="field"><label class="field-label">Owner / Contact Name</label><input class="field-input" id="f-owner" type="text" placeholder="e.g. Park Ji-young" value="'+esc(state.ownerName)+'"></div>'
+    + '<div class="field"><label class="field-label">Owner Phone Number *</label><input class="field-input" id="f-phone" type="tel" placeholder="(770) 555-0123" value="'+esc(state.phone)+'"></div>'
+    + '<div class="field"><label class="field-label">Owner Email Address</label><input class="field-input" id="f-email" type="email" placeholder="owner@business.com" value="'+esc(state.email)+'"></div>'
+    + '<div class="field"><label class="field-label">Industry *</label><select class="field-input" id="f-ind">'+opts+'</select></div>'
+    + (state.error ? '<div class="error-box" style="margin-bottom:14px">'+esc(state.error)+'</div>' : '')
+    + '<div class="btn-row"><button class="btn btn-secondary" id="btn-back">← Back</button><button class="btn btn-primary" id="btn-submit">Create Digital Form →</button></div>'
+    + '</div></div>'
+    + '<div class="card"><div class="card-head">What Happens Next</div><div class="card-body">'
+    + [['🤖','Claude reads every field exactly as written'],['📝','A matching Tally form is built digitally'],['📱','Owner gets a Korean SMS with the link'],['📧','Owner gets email with QR code'],['🖨️','Rep gets confirmation SMS']].map(function(r){ return '<div class="tip"><span style="font-size:18px;flex-shrink:0">'+r[0]+'</span><span class="tip-text">'+r[1]+'</span></div>'; }).join('')
+    + '</div></div>';
 }
 
 function renderLoading() {
-  const steps = [
-    "📷 Sending photo to Claude AI...",
-    "🔍 Reading every field on the form...",
-    "🏗️ Building digital form in Tally...",
-    "📱 Sending SMS and email to owner...",
-  ];
-  return `
-    <div class="card">
-      <div class="loading-wrap">
-        <div class="spinner"></div>
-        <div class="loading-title">Building form for ${esc(state.bizName)}...</div>
-        <div class="loading-sub">Claude is reading the form image and replicating every field. This takes about 20–30 seconds.</div>
-        <div class="loading-steps">
-          ${steps.map((s,i) => `<div class="loading-step" id="lstep-${i}">${s}</div>`).join("")}
-        </div>
-      </div>
-    </div>`;
+  return '<div class="card"><div class="loading-wrap"><div class="spinner"></div>'
+    + '<div class="loading-title">Building form for '+esc(state.bizName)+'...</div>'
+    + '<div class="loading-sub">Claude is reading every field on the form image. Takes about 20–30 seconds.</div>'
+    + '<div class="loading-steps">'
+    + ['📷 Compressing and sending image...','🔍 Claude reading every field on the form...','🏗️ Building digital form in Tally...','📱 Sending SMS and email to owner...'].map(function(s,i){ return '<div class="loading-step" id="ls'+i+'">'+s+'</div>'; }).join('')
+    + '</div></div></div>';
 }
 
 function renderDone() {
-  const r = state.result || {};
-  const formUrl = r.tally_url || r.form_url || "";
-  const qrUrl = r.qr_url || (formUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(formUrl)}` : "");
-  const fieldCount = r.field_count || "?";
-  const formTitle = r.form_title || "Digital Form";
-
-  return `
-    <div class="card">
-      <div class="card-body">
-        <div class="success-icon">✅</div>
-        <div class="success-title">Form Created!</div>
-        <div class="success-sub">The digital form for <strong style="color:#fff">${esc(state.bizName)}</strong> is live — ${fieldCount} fields digitized.</div>
-
-        ${formUrl ? `
-        <div class="form-url-box">
-          <div class="form-url-label">Form Title</div>
-          <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:8px">${esc(formTitle)}</div>
-          <div class="form-url-label">Live Link</div>
-          <a href="${formUrl}" target="_blank" style="color:var(--teal-light)">${formUrl}</a>
-        </div>` : ""}
-
-        ${qrUrl ? `
-        <div class="qr-box">
-          <img src="${qrUrl}" alt="QR Code">
-        </div>
-        <div class="qr-note">Screenshot this QR code to print for the form holder</div>` : ""}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">Notifications Sent</div>
-      <div class="card-body">
-        ${[
-          ["📱", `SMS to ${state.phone || "owner"}`, !!state.phone],
-          ["📧", `Email to ${state.email || "owner"}`, !!state.email],
-          ["🗂️", "Logged to Airtable", true],
-          ["💼", "Contact created in HubSpot", true],
-        ].map(([icon, label, sent]) => `
-          <div class="notif-row">
-            <span class="notif-icon">${icon}</span>
-            <span class="notif-text">${label}</span>
-            <span class="notif-status">${sent ? "Sent ✓" : "Skipped"}</span>
-          </div>`).join("")}
-      </div>
-    </div>
-
-    <button class="btn btn-primary" id="btn-reset" style="margin-bottom:4px">📷 Scan Another Form</button>`;
+  var r = state.result || {};
+  var formUrl = r.tally_url || r.form_url || '';
+  var qrUrl = r.qr_url || (formUrl ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='+encodeURIComponent(formUrl) : '');
+  var fieldCount = r.field_count || '—';
+  var formTitle = r.form_title || 'Digital Form';
+  return '<div class="card"><div class="card-body">'
+    + '<div class="success-icon">✅</div>'
+    + '<div class="success-title">Form Created!</div>'
+    + '<div class="success-sub">Digital form for <strong style="color:#fff">'+esc(state.bizName)+'</strong> is live — '+fieldCount+' fields digitized.</div>'
+    + (formUrl ? '<div class="form-url-box"><div class="form-url-label">Form Title</div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:8px">'+esc(formTitle)+'</div><div class="form-url-label">Live Link</div><a href="'+formUrl+'" target="_blank" style="color:var(--teal-light)">'+formUrl+'</a></div>' : '')
+    + (qrUrl ? '<div class="qr-box"><img src="'+qrUrl+'" alt="QR Code"></div><div class="qr-note">Screenshot this QR code to print for the form holder</div>' : '')
+    + '</div></div>'
+    + '<div class="card"><div class="card-head">Notifications Sent</div><div class="card-body">'
+    + [['📱','SMS to owner',!!state.phone],['📧','Email with QR code',!!state.email],['🗂️','Logged to Airtable',true],['💼','HubSpot contact created',true]].map(function(n){ return '<div class="notif-row"><span class="notif-icon">'+n[0]+'</span><span class="notif-text">'+n[1]+'</span><span class="notif-status">'+(n[2]?'Sent ✓':'Skipped')+'</span></div>'; }).join('')
+    + '</div></div>'
+    + '<button class="btn btn-primary" id="btn-reset" style="margin-bottom:4px">📷 Scan Another Form</button>';
 }
 
-function esc(s) { return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
-
+// ── EVENT BINDING ──────────────────────────────────────────────────────────────
 function bindEvents() {
-  const on = (id, evt, fn) => { const el = document.getElementById(id); if (el) el.addEventListener(evt, fn); };
-
-  on("btn-camera", "click", () => document.getElementById("camera-input").click());
-  on("btn-library", "click", () => document.getElementById("library-input").click());
-  on("btn-retake", "click", () => { state.preview = null; state.imageBase64 = null; setStep(0); });
-  on("btn-back", "click", () => setStep(0));
-  on("btn-reset", "click", () => {
-    state = { step:0, imageBase64:null, imageType:"image/jpeg", preview:null, bizName:"", ownerName:"", phone:"", email:"", industry:"", result:null, error:null };
+  function on(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener('click', fn); }
+  on('btn-camera', function(){ document.getElementById('camera-input').click(); });
+  on('btn-library', function(){ document.getElementById('library-input').click(); });
+  on('btn-retake', function(){ state.preview=null; state.imageBase64=null; state.compressedSize=0; setStep(0); });
+  on('btn-back', function(){ setStep(0); });
+  on('btn-reset', function(){
+    state={step:0,imageBase64:null,imageType:'image/jpeg',preview:null,originalSize:0,compressedSize:0,bizName:'',ownerName:'',phone:'',email:'',industry:'',result:null,error:null};
     setStep(0);
   });
-
-  on("btn-submit", "click", () => {
-    state.bizName = document.getElementById("f-bizname")?.value?.trim() || "";
-    state.ownerName = document.getElementById("f-owner")?.value?.trim() || "";
-    state.phone = document.getElementById("f-phone")?.value?.trim() || "";
-    state.email = document.getElementById("f-email")?.value?.trim() || "";
-    state.industry = document.getElementById("f-industry")?.value || "";
-
-    if (!state.bizName) { state.error = "Business name is required."; render(); return; }
-    if (!state.phone) { state.error = "Owner phone number is required."; render(); return; }
-    if (!state.industry) { state.error = "Please select an industry."; render(); return; }
-    state.error = null;
+  on('btn-submit', function(){
+    state.bizName = (document.getElementById('f-biz')||{}).value||'';
+    state.ownerName = (document.getElementById('f-owner')||{}).value||'';
+    state.phone = (document.getElementById('f-phone')||{}).value||'';
+    state.email = (document.getElementById('f-email')||{}).value||'';
+    state.industry = (document.getElementById('f-ind')||{}).value||'';
+    if (!state.bizName.trim()){state.error='Business name is required.';render();return;}
+    if (!state.phone.trim()){state.error='Owner phone number is required.';render();return;}
+    if (!state.industry){state.error='Please select an industry.';render();return;}
+    state.error=null;
     submitForm();
   });
-
-  // Keep field values on re-render
-  ["f-bizname","f-owner","f-phone","f-email"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("input", e => {
-      const map = {"f-bizname":"bizName","f-owner":"ownerName","f-phone":"phone","f-email":"email"};
-      state[map[id]] = e.target.value;
-    });
+  // Persist field values
+  [['f-biz','bizName'],['f-owner','ownerName'],['f-phone','phone'],['f-email','email']].forEach(function(p){
+    var el=document.getElementById(p[0]);
+    if(el) el.addEventListener('input',function(e){state[p[1]]=e.target.value;});
   });
-  const sel = document.getElementById("f-industry");
-  if (sel) sel.addEventListener("change", e => state.industry = e.target.value);
+  var sel=document.getElementById('f-ind');
+  if(sel) sel.addEventListener('change',function(e){state.industry=e.target.value;});
 }
 
-async function handleImage(file) {
+// ── IMAGE HANDLING ────────────────────────────────────────────────────────────
+async function handleFile(file) {
   if (!file) return;
-  state.imageType = file.type || "image/jpeg";
-  const reader = new FileReader();
-  reader.onload = e => {
-    const dataUrl = e.target.result;
-    state.preview = dataUrl;
-    state.imageBase64 = dataUrl.split(",")[1];
+  state.error = null;
+  // Show converting indicator
+  document.getElementById('app-body').innerHTML = '<div class="card"><div class="loading-wrap"><div class="spinner"></div><div class="loading-title">Processing image...</div><div class="loading-sub">Converting to JPEG and optimizing for Claude.</div></div></div>';
+  try {
+    var result = await compressToJpeg(file);
+    state.imageBase64 = result.base64;
+    state.imageType = result.type;
+    state.preview = result.dataUrl;
+    state.originalSize = result.originalSize;
+    state.compressedSize = result.compressedSize;
     setStep(1);
-  };
-  reader.readAsDataURL(file);
+  } catch(err) {
+    state.error = err.message || 'Could not process image. Try taking a new photo.';
+    setStep(0);
+    document.getElementById('app-body').innerHTML = renderPhoto() + '<div class="error-box" style="margin:0 16px 16px">' + esc(state.error) + '</div>';
+    bindEvents();
+  }
 }
 
-document.getElementById("camera-input").addEventListener("change", e => handleImage(e.target.files?.[0]));
-document.getElementById("library-input").addEventListener("change", e => handleImage(e.target.files?.[0]));
+document.getElementById('camera-input').addEventListener('change', function(e){ handleFile(e.target.files&&e.target.files[0]); this.value=''; });
+document.getElementById('library-input').addEventListener('change', function(e){ handleFile(e.target.files&&e.target.files[0]); this.value=''; });
 
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
 async function submitForm() {
   setStep(2);
-
-  // Animate loading steps
-  let stepIdx = 0;
-  const stepAnim = setInterval(() => {
-    const all = document.querySelectorAll(".loading-step");
-    all.forEach((el, i) => el.className = "loading-step" + (i === stepIdx ? " active-step" : ""));
-    stepIdx = (stepIdx + 1) % 4;
-  }, 6000);
+  var stepIdx = 0;
+  var anim = setInterval(function(){
+    for(var i=0;i<4;i++){var el=document.getElementById('ls'+i);if(el)el.className='loading-step'+(i===stepIdx?' active-step':'');}
+    stepIdx=(stepIdx+1)%4;
+  }, 5000);
 
   try {
-    const payload = {
-      image_base64: state.imageBase64 || "",
+    var payload = {
+      image_base64: state.imageBase64 || '',
       image_media_type: state.imageType,
       business_name: state.bizName,
       owner_name: state.ownerName,
@@ -444,34 +334,28 @@ async function submitForm() {
       industry: state.industry,
       timestamp: new Date().toISOString(),
     };
-
-    const res = await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    var res = await fetch(WEBHOOK_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload),
     });
-
-    clearInterval(stepAnim);
-
-    if (!res.ok) throw new Error("Server returned " + res.status);
-    const data = await res.json().catch(() => ({}));
-
+    clearInterval(anim);
+    if (!res.ok) throw new Error('Server returned '+res.status);
+    var data = await res.json().catch(function(){return{};});
     state.result = {
-      tally_url: data.tally_url || data.form_url || null,
-      qr_url: data.qr_url || null,
-      form_title: data.form_title || state.bizName + " Form",
-      field_count: data.field_count || "—",
+      tally_url: data.tally_url||data.form_url||null,
+      qr_url: data.qr_url||null,
+      form_title: data.form_title||state.bizName+' Form',
+      field_count: data.field_count||'—',
     };
     setStep(3);
-
-  } catch (err) {
-    clearInterval(stepAnim);
-    state.error = "Something went wrong connecting to n8n. Check the webhook URL or your internet connection. (" + err.message + ")";
+  } catch(err) {
+    clearInterval(anim);
+    state.error = 'Could not connect to the form builder. Check your internet and try again. ('+err.message+')';
     setStep(1);
   }
 }
 
-// Initial render
 render();
 </script>
 </body>
